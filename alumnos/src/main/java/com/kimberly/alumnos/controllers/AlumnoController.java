@@ -26,6 +26,12 @@ public class AlumnoController {
         return alumnoRepository.findAll();
 
     }
+    @GetMapping("/traer-alumnos/{id}")
+    public ResponseEntity<Alumno> TraerunAlumno(@PathVariable Long id){
+        return alumnoRepository.findById(id)
+        .map(alumno -> ResponseEntity.ok(alumno))
+        .orElse(ResponseEntity.notFound().build());
+    }
     //metodo para insertar alumno en la base de datos
     @PostMapping("/insertar-alumnos")
     public Alumno insertarAlumno(@RequestBody Alumno alumno){
