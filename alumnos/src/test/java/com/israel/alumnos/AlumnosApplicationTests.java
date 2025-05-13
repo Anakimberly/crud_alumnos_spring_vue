@@ -1,4 +1,4 @@
-package com.kimberly.alumnos;
+package com.israel.alumnos;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
