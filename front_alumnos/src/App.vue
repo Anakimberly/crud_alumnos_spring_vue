@@ -9,8 +9,11 @@ const nuevoAlumno = ref({
   nombre: '',
   apellido: '',
   carrera: '',
+  semestre: '',
+  grupo: '',
   telefono: '',
-  imagenURL: ''
+  imagenURL: '',
+
 });
 
 const editado = ref(false);
@@ -41,6 +44,8 @@ const agregarAlumno = async () => {
     nombre: '',
     apellido: '',
     carrera: '',
+    semestre: '',
+    grupo: '',
     telefono: '',
     imagenURL: ''
   };
