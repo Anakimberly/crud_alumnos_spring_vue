@@ -115,6 +115,15 @@ onMounted(cargarAlumnos);
                 <label for="carrera" class="form-label">Carrera</label>
                 <input type="text" class="form-control" id="carrera" v-model="nuevoAlumno.carrera" required>
               </div>
+
+               <div class="col-md-6 mb-3">
+                <label for="carrera" class="form-label">Semestre</label>
+                <input type="text" class="form-control" id="semestre" v-model="nuevoAlumno.semestre" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="carrera" class="form-label">Grupo</label>
+                <input type="text" class="form-control" id="grupo" v-model="nuevoAlumno.grupo" required>
+              </div>
               <div class="col-md-6 mb-3">
                 <label for="telefono" class="form-label">Telefono</label>
                 <input type="number" class="form-control" id="telefono" v-model="nuevoAlumno.telefono" required>
