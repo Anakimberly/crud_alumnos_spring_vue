@@ -9,8 +9,6 @@ const nuevoAlumno = ref({
   nombre: '',
   apellido: '',
   carrera: '',
-  semestre: '',
-  grupo: '',
   telefono: '',
   imagenURL: '',
 
@@ -44,8 +42,6 @@ const agregarAlumno = async () => {
     nombre: '',
     apellido: '',
     carrera: '',
-    semestre: '',
-    grupo: '',
     telefono: '',
     imagenURL: ''
   };
@@ -121,14 +117,7 @@ onMounted(cargarAlumnos);
                 <input type="text" class="form-control" id="carrera" v-model="nuevoAlumno.carrera" required>
               </div>
 
-               <div class="col-md-6 mb-3">
-                <label for="carrera" class="form-label">Semestre</label>
-                <input type="text" class="form-control" id="semestre" v-model="nuevoAlumno.semestre" required>
-              </div>
-              <div class="col-md-6 mb-3">
-                <label for="carrera" class="form-label">Grupo</label>
-                <input type="text" class="form-control" id="grupo" v-model="nuevoAlumno.grupo" required>
-              </div>
+            
               <div class="col-md-6 mb-3">
                 <label for="telefono" class="form-label">Telefono</label>
                 <input type="number" class="form-control" id="telefono" v-model="nuevoAlumno.telefono" required>
@@ -159,8 +148,6 @@ onMounted(cargarAlumnos);
                   <th scope="col">Nombre</th>
                   <th scope="col">Apellidos</th>
                   <th scope="col">Carrera</th>
-                  <th scope="col">Semestre</th>
-                  <th scope="col">Grupo</th>
                   <th scope="col">telefono</th>
                   <th scope="col">imagen</th>
                   <th scope="col">Acciones</th>
@@ -173,8 +160,7 @@ onMounted(cargarAlumnos);
                   <td>{{ alumno.nombre }}</td>
                   <td>{{ alumno.apellido }}</td>
                   <td>{{ alumno.carrera }}</td>
-                  <td>{{ alumno.semestre }}</td>
-                  <td>{{ alumno.grupo }}</td>
+                 
                   <td>{{ alumno.telefono }}</td>
                   <td><img :src="alumno.imagenURL" alt="Imagen de Alumno" width="50"></td>
                   <td><button @click=eliminarAlumno(alumno.id) class="btn btn-danger mx-2"><i
