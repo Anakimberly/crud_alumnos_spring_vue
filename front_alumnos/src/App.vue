@@ -1,30 +1,255 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
+import Swal from 'sweetalert2';
+
+const alumnos = ref([]);
+
+const nuevoAlumno = ref({
+  nombre: '',
+  apellido: '',
+  carrera: '',
+  telefono: '',
+  imagenURL: '',
+
+});
+
+const editado = ref(false);
+
+const cargarAlumnos = async () => {
+
+  const response = await axios.get('http://localhost:8080/alumnos/traer-alumnos')
+  alumnos.value = response.data;
+  console.log(alumnos.value);
+}
+const agregarAlumno = async () => {
+  if (editado.value) {
+    await axios.put(`http://localhost:8080/alumnos/editar-alumnos/${nuevoAlumno.value.id}`, nuevoAlumno.value);
+    // editado.value = false
+  } else {
+    await axios.post('http://localhost:8080/alumnos/insertar-alumnos', nuevoAlumno.value);
+    Swal.fire({
+      icon: 'success',
+      title: 'Alumno agregado correctamente',
+      showConfirmButton: false,
+      timer: 1500
+    });
+
+  }
+
+  await cargarAlumnos();
+  nuevoAlumno.value = {
+    nombre: '',
+    apellido: '',
+    carrera: '',
+    telefono: '',
+    imagenURL: ''
+  };
+}
+// Función para editar un alumno
+const editarAlumnos = (alumno) => {
+  Object.assign(nuevoAlumno.value, alumno);
+  editado.value = true
+}
+
+const eliminarAlumno = async (id) => {
+
+  Swal.fire({
+    title: '¿Estás seguro de eliminar el alumno?',
+    text: "No podrás revertir esto!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Sí, eliminarlo!'
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      await eliminarAlumnoPorId(id);
+      Swal.fire(
+        'Eliminado!',
+        'El alumno ha sido eliminado.',
+        'success'
+      )
+    }
+  })
+}
+
+const eliminarAlumnoPorId = async (id) => {
+  try {
+    await axios.delete(`http://localhost:8080/alumnos/eliminar-alumnos/${id}`);
+
+    console.log('Alumno eliminado con id:', id);
+    await cargarAlumnos();
+  } catch (errr) {
+    console.error('Error al eliminar el alumno:', errr);
+    Swal.fire({
+      icon: 'error',
+      title: 'Error al eliminar el alumno',
+      text: 'No se pudo eliminar el alumno.',
+
+    });
+  }
+}
+onMounted(cargarAlumnos);
+
+
+
 </script>
 
 <template>
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12 mt-4">
+        <div class="card shadow p-4 mb-4">
+          <h2 class="text-center">Formulario de Alumnos</h2>
+          <form @submit.prevent="agregarAlumno">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="nombre" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="nombre" v-model="nuevoAlumno.nombre" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="apellido" class="form-label">Apellidos</label>
+                <input type="text" class="form-control" id="apellido" v-model="nuevoAlumno.apellido" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="carrera" class="form-label">Carrera</label>
+                <input type="text" class="form-control" id="carrera" v-model="nuevoAlumno.carrera" required>
+              </div>
+
+            
+              <div class="col-md-6 mb-3">
+                <label for="telefono" class="form-label">Telefono</label>
+                <input type="number" class="form-control" id="telefono" v-model="nuevoAlumno.telefono" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="imagenURL" class="form-label">Imagen URL</label>
+                <input type="text" class="form-control" id="imagenURL" v-model="nuevoAlumno.imagenURL">
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+              {{ editado ? 'Actualizar Alumno' : 'Agregar Alumno' }}
+            </button>
+          </form>
+
+        </div>
+
+      </div>
+
+      <div class="col-md-12">
+        <div class="card shadow">
+          <div class="card-body">
+            <h5 class="card-title mb-3">Lista de Alumnos</h5>
+            <table class="table table-hover align-middle">
+              <thead class="table-dark">
+                <tr>
+                  <th scope="col">Id</th>
+                  <th scope="col">Nombre</th>
+                  <th scope="col">Apellidos</th>
+                  <th scope="col">Carrera</th>
+                  <th scope="col">telefono</th>
+                  <th scope="col">imagen</th>
+                  <th scope="col">Acciones</th>
+
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="alumno in alumnos" :key="alumno.id">
+                  <td>{{ alumno.id }}</td>
+                  <td>{{ alumno.nombre }}</td>
+                  <td>{{ alumno.apellido }}</td>
+                  <td>{{ alumno.carrera }}</td>
+                 
+                  <td>{{ alumno.telefono }}</td>
+                  <td><img :src="alumno.imagenURL" alt="Imagen de Alumno" width="50"></td>
+                  <td><button @click=eliminarAlumno(alumno.id) class="btn btn-danger mx-2"><i
+                        class="bi bi-trash3-fill"></i></button>
+                    <button @click="editarAlumnos(alumno)" class="btn btn-warning"><i
+                        class="bi bi-pencil-fill"></i></button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
-  <HelloWorld msg="Vite + Vue" />
+
 </template>
 
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+/* Imagen de alumno */
+td img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 50%; /* círculo perfecto */
+  border: 3px solid #eef2f2; /* contorno azul */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+
+td img:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 10px #20fbff;
 }
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+
+/* Tarjetas (formulario y tabla) */
+.card {
+  border-radius: 16px;
+  background-color: #f9f9f9;
+  border: none;
+  margin-bottom: 30px;
+}
+
+/* Botones */
+button.btn-primary {
+  background-color: #007bff;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+button.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+button.btn-danger:hover {
+  background-color: #c82333;
+}
+
+button.btn-warning:hover {
+  background-color: #e0a800;
+}
+
+/* Tabla */
+table {
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+thead {
+  background-color: #007bff;
+  color: white;
+}
+
+tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Títulos */
+h2,
+h5 {
+  text-align: center;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Contenedor principal */
+.container {
+  padding-top: 30px;
+  padding-bottom: 30px;
 }
 </style>
